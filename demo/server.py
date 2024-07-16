@@ -5,8 +5,16 @@ from fastapi.responses import StreamingResponse
 import openpyxl
 import json
 from typing import List
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Adjust this to match your Vue.js app's URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def stream_data(file_path: str):
     # Open the .xlsx file
