@@ -3,6 +3,7 @@
       <div class="good-night-container">
         <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/f8b3c38ac465a7bc7a71441f87d388fb98da3154f1d74ea3f1e940c5c18ceaf1?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="background-image" alt="" />
         <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/54afc3a23b4a729daee8341f9d60916b27cadf4fc0b646680ad1a9ee2326274d?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="top-image" alt="" />
+        <img class="moon" src="../assets/moon.png" alt="">
         <header class="header">
           <h1 class="greeting">Good Night</h1>
           <p class="time">23:30</p>
@@ -12,16 +13,7 @@
           <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/b6716f6ccbb1c1d439e547792df58a0aa51bd9f1a0c2abe344ba68116c06896f?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="breathing-image" alt="Breathing visualization" />
           <button class="stop-recording-btn">ยืนยันการตื่นนอน</button>
         </main>
-        <footer class="footer-actions">
-        <div class="action-item">
-          <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/be0156c2384f31ea9ae55796cedf39f1cce6313e4893a5f9fdad6f7973f8c4d0?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="action-icon" alt="Breathing icon" />
-          <p class="action-text">การหายใจ</p>
-        </div>
-        <div class="action-item">
-          <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/3608c38c5e37b108fb8646888d62b78880c6511ec2e9b9678d1d6ae4ae6acb29?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="action-icon" alt="Statistics icon" />
-          <p class="action-text">สถิติ</p>
-        </div>
-      </footer>
+
       </div>
   
   </template>
@@ -74,7 +66,17 @@
     object-fit: cover;
     object-position: center;
   }
-  
+  .moon{
+    top: 53%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+    position: absolute;
+    margin: 0;
+    width: 200px;
+    height: 200px;
+    z-index: 1;
+  }
   .top-image {
     aspect-ratio: 9.09;
     object-fit: auto;
@@ -94,11 +96,12 @@
   
   .time {
     margin-top: 15px;
+    
     font: 900 64px 'CustomFont', sans-serif;
   }
   
   .status-message {
-    top: 50%;
+    top: 68%;
   left: 50%;
   text-align: center;
   transform: translate(-50%, -50%);
@@ -118,7 +121,7 @@
   }
   
   .stop-recording-btn {
-    top: 70%;
+    top: 80%;
   left: 50%;
   text-align: center;
   transform: translate(-50%, -50%);
