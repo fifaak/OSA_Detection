@@ -6,7 +6,7 @@ import Sleeping from '../components/Sleeping.vue';
 const routes = [
   { path: '/', component: Login },
   { path: '/home', component: Home },
-  { path: '/sleep' , component: Sleeping}
+  { path: '/sleeping' , component: Sleeping}
 ];
 
 const router = createRouter({
