@@ -1,0 +1,74 @@
+<template>
+    <div id="app">
+      <h1>Real-time Temperature Chart</h1>
+      <TemperatureChart ref="chart" />
+    </div>
+  </template>
+  
+  <script>
+  import { ref, onMounted } from 'vue';
+  import TemperatureChart from './components/TemperatureChart.vue';
+  
+  export default {
+    name: 'App',
+    components: {
+      TemperatureChart
+    },
+    setup() {
+      const chart = ref(null);
+      let timeCounter = 0;
+  
+      const fetchData = async () => {
+        console.log('Starting to fetch data...');
+        const response = await fetch('http://127.0.0.1:8000/stream');
+        const reader = response.body.getReader();
+  
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            console.log('Stream completed');
+            break;
+          }
+  
+          const chunk = new TextDecoder().decode(value);
+          console.log('Received chunk:', chunk);
+          const lines = chunk.split('\n');
+  
+          for (const line of lines) {
+            if (line.trim()) {
+              try {
+                const data = JSON.parse(line);
+                console.log('Successfully parsed data:', data);
+                updateChart(data);
+              } catch (error) {
+                console.error('Error parsing JSON:', error);
+                console.error('Problematic line:', line);
+              }
+            }
+          }
+        }
+      };
+  
+      const updateChart = (data) => {
+        if (chart.value && chart.value.updateChartData) {
+          console.log('Updating chart with data:', data);
+          if (data.temp === undefined) {
+            console.error('Invalid data format:', data);
+            return;
+          }
+          timeCounter = data.sec || 0;
+          chart.value.updateChartData(timeCounter, data.temp);
+        } else {
+          console.warn('Chart component not yet mounted or updateChartData method not available');
+        }
+      };
+  
+      onMounted(() => {
+        console.log('App component mounted');
+        fetchData();
+      });
+  
+      return { chart };
+    }
+  };
+  </script>
