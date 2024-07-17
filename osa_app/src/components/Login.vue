@@ -7,7 +7,7 @@ width: 246px;
 height: 246px;
 left: calc(50% - 246px/2);
 top: 52px;
-
+z-index: 1;
 background: url(S__4423684.jpg);
 border-radius: 120px;
 " alt="">
@@ -78,11 +78,11 @@ export default {
   transform: translate(-50%, -50%);
   padding: 30px 20px;
   border-radius: 20px;
-  background: rgba(0, 0, 0, 0.5);
   width: 80%;
   height: auto;
   max-width: 400px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  /* background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); */
 }
 
 .login-form {
@@ -96,8 +96,8 @@ export default {
 }
 
 .input-field {
-  font-family: Rubik, sans-serif;
-  border-radius: 30px;
+  font-family: 'CustomFont', sans-serif;
+  border-radius: 15px;
   border: 2px solid #fff;
   padding: 15px 0px;
   width: 95%;
@@ -105,7 +105,7 @@ export default {
   color: #fff;
   font-size: 16px;
   margin-top: 10px;
-
+  background-color: rgba(255, 255, 255, 0.066);
   padding-left: 10px; /* Adding padding to align text */
 }
 
@@ -115,8 +115,8 @@ export default {
 }
 
 .login-button {
+  font-family: 'CustomFont', sans-serif;
   margin-top: 20px;
-  font-family: Rubik, sans-serif;
   border-radius: 30px;
   background-color: #fff;
   padding: 15px 20px;
@@ -129,9 +129,6 @@ export default {
   transition: background-color 0.3s;
 }
 
-.login-button:hover {
-  background-color: #f0f0f0;
-}
 
 .visually-hidden {
   position: absolute;

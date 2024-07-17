@@ -1,13 +1,13 @@
 <template>
   <div class="good-night-container">
     <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/f8b3c38ac465a7bc7a71441f87d388fb98da3154f1d74ea3f1e940c5c18ceaf1?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="background-image" alt="" />
-    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/54afc3a23b4a729daee8341f9d60916b27cadf4fc0b646680ad1a9ee2326274d?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="top-image" alt="" />
+    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/54afc3a23b4a729daee8341f9d60916b27cadf4fc0b646680ad1a9ee2326274d?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="top-image" alt="" @click="navigateToLogin" />
     <header class="greeting-header">
-      <h1 class="greeting-text">Good Night</h1>
-      <p class="time-display">23:30</p>
+      <h1 class="greeting-text">{{ greeting }}</h1>
+      <p class="time-display">{{ formattedTime }}</p>
     </header>
     <main class="main-content">
-      <section class="sleep-start-section">
+      <section class="sleep-start-section" @click="navigateToSleeping">
         <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/d2d95dc68ad82486c0a84439e3cdfc1d5b8de6bcb3f140154d61f9e3090e3cd8?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="sleep-icon" alt="Sleep icon" />
         <p class="sleep-text">เริ่มนอน</p>
       </section>
@@ -26,10 +26,52 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
-  name: 'LoginForm'
+  name: 'SleepingView',
+  setup() {
+    const router = useRouter();
+    const navigateToSleeping = () => {
+      router.push('/sleeping');
+    };
+    const navigateToLogin = () => {
+      router.push('/');
+    }
+    const currentTime = ref(new Date());
+
+    const updateTime = () => {
+      currentTime.value = new Date();
+    };
+
+    onMounted(() => {
+      updateTime();
+      const timer = setInterval(updateTime, 1000);
+      onUnmounted(() => clearInterval(timer));
+    });
+
+    const formattedTime = computed(() => {
+      const hours = currentTime.value.getHours().toString().padStart(2, '0');
+      const minutes = currentTime.value.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    });
+
+    const greeting = computed(() => {
+      const hour = currentTime.value.getHours();
+      if (hour >= 5 && hour < 12) return 'Good Morning';
+      if (hour >= 12 && hour < 17) return 'Good Afternoon';
+      if (hour >= 17 && hour < 21) return 'Good Evening';
+      return 'Good Night';
+    });
+
+    return {
+      formattedTime,
+      greeting,
+      navigateToSleeping,
+      navigateToLogin
+    };
+  }
 };
 </script>
 
@@ -39,15 +81,16 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  position: relative;
+  /* position: absolute; */
   aspect-ratio: 0.46;
-  max-width: 480px;
+  /* max-width: 480px; */
   width: 100%;
+  padding: 0;
   align-items: center;
   color: #fff;
   font-weight: 800;
   margin: 0 auto;
-  padding: 45px 0;
+  /* border: 2px solid black; */
 }
 
 .background-image {
@@ -57,6 +100,7 @@ export default {
   width: 100%;
   object-fit: cover;
   object-position: center;
+  z-index: -1;
 }
 
 .top-image {
@@ -86,15 +130,18 @@ export default {
 }
 
 .sleep-start-section {
-  position: relative;
-  border: 5px solid rgba(0, 0, 0, 1);
-  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25) inset;
+  position: absolute;
+  /* border: 5px solid rgba(0, 0, 0, 1); */
+  box-shadow: 0 14px 14px 0 rgba(0, 0, 0, 0.25) inset;
   background-color: #fff;
   border-radius: 50%;
   display: flex;
   margin-top: 205px;
-  width: 230px;
-  max-width: 100%;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 130px;
+  height: 130px;
   flex-direction: column;
   font-size: 32px;
   color: #1e1e1e;
@@ -112,18 +159,23 @@ export default {
 }
 
 .sleep-text {
-  font-family: Rubik, sans-serif;
+  font-family: 'CustomFont', sans-serif;
   margin-top: 14px;
 }
 
 .footer-actions {
-  position: relative;
+  /* border: 2px solid white; */
+  position: absolute; 
+    bottom: -40px; 
+    z-index: 10;
   display: flex;
-  margin-top: 49px;
-  width: 100%;
-  max-width: 298px;
+
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  /* width: 100%; */
   align-items: start;
-  gap: 20px;
+  gap: 160px;
   font-size: 15px;
   font-weight: 400;
   white-space: nowrap;
@@ -146,7 +198,7 @@ export default {
 }
 
 .action-text {
-  font-family: Rubik, sans-serif;
+  font-family: 'CustomFont', sans-serif;
   margin-top: 5px;
 }
 </style>
