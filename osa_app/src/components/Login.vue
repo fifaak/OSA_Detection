@@ -1,40 +1,30 @@
 <template>
-  <form class="login-form" @submit.prevent="handleSubmit">
-    <img src="../assets/S__4423684 1.png" style="/* S__4423684 1 */
 
-position: absolute;
-width: 246px;
-height: 246px;
-left: calc(50% - 246px/2);
-top: 52px;
-z-index: 1;
-background: url(S__4423684.jpg);
-border-radius: 120px;
-" alt="">
-    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/f8b3c38ac465a7bc7a71441f87d388fb98da3154f1d74ea3f1e940c5c18ceaf1?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="background-image" alt="" />
+  <form class="login-form" @submit.prevent="handleSubmit">
+    <img loading="lazy"
+      src="https://cdn.builder.io/api/v1/image/assets/TEMP/f8b3c38ac465a7bc7a71441f87d388fb98da3154f1d74ea3f1e940c5c18ceaf1?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&"
+      class="background-image" alt="" />
     <div class="form">
+      <div style="margin: auto; width: 100%; text-align: center;">
+
+      <img src="../assets/S__4423684 1.png" style="/* S__4423684 1 */
+    position: relative;
+      margin: auto;
+    width: 246px;
+    height: 246px;
+    z-index: 1;
+    background: url(S__4423684.jpg);
+    border-radius: 120px;
+  " alt="">
+      </div>
       <h1 style="font-size: 1rem; text-align: center;color: white;">ยินดีต้อนรับสู่ Good Night </h1>
       <div class="input-wrapper">
         <label for="email" class="visually-hidden">Email</label>
-        <input
-          type="email"
-          id="email"
-          v-model="email"
-          class="input-field"
-          placeholder="Email"
-          required
-        />
+        <input type="email" id="email" v-model="email" class="input-field" placeholder="Email" required />
       </div>
       <div class="input-wrapper">
         <label for="password" class="visually-hidden">รหัสผ่าน</label>
-        <input
-          type="password"
-          id="password"
-          v-model="password"
-          class="input-field"
-          placeholder="รหัสผ่าน"
-          required
-        />
+        <input type="password" id="password" v-model="password" class="input-field" placeholder="รหัสผ่าน" required />
       </div>
       <div class="input-wrapper">
         <button type="submit" class="login-button">เข้าสู่ระบบ</button>
@@ -72,14 +62,17 @@ export default {
 
 <style scoped>
 .form {
+
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
-  padding: 30px 20px;
+  padding: 50px 20px;
   border-radius: 20px;
   width: 80%;
+  /* border: 2px solid black; */
   height: auto;
+  display: block;
   max-width: 400px;
   /* background: rgba(0, 0, 0, 0.5);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); */
@@ -89,6 +82,8 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  /* padding-top:150px; */
 }
 
 .input-wrapper {
@@ -106,12 +101,14 @@ export default {
   font-size: 16px;
   margin-top: 10px;
   background-color: rgba(255, 255, 255, 0.066);
-  padding-left: 10px; /* Adding padding to align text */
+  padding-left: 10px;
+  /* Adding padding to align text */
 }
 
 .input-field::placeholder {
   color: #ddd;
-  padding-left: 10px; /* Adding padding to the placeholder */
+  padding-left: 10px;
+  /* Adding padding to the placeholder */
 }
 
 .login-button {

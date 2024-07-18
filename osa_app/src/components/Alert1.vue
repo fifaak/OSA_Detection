@@ -69,7 +69,7 @@
     position: relative;
     font-family: "CustomFont", sans-serif;
     font-weight: 600;
-    font-size: 30px;
+    font-size: 22px;
     margin-top: 15px;
     margin-bottom:0px;
   }

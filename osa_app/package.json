@@ -6,9 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "ionic:build": "npm run build",
+    "ionic:serve": "vite dev --host"
   },
   "dependencies": {
+    "@capacitor/cli": "^6.1.1",
+    "@capacitor/core": "^6.1.1",
+    "@capacitor/ios": "6.1.1",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
     "vue": "^3.4.31",

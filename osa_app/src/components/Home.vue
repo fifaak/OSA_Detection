@@ -84,6 +84,7 @@ export default {
 
 <style scoped>
 .good-night-container {
+  /* padding-top:50px; */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -91,7 +92,7 @@ export default {
   aspect-ratio: 0.46;
   /* max-width: 480px; */
   width: 100%;
-  padding: 0;
+  /* padding: 0; */
   align-items: center;
   color: #fff;
   font-weight: 800;
@@ -115,9 +116,20 @@ export default {
   text-align: center;
   margin-top: 60px;
 }
+.top-image{
+  position: absolute;
+  inset: 0;
+  height: auto;
+  width: 80%;
 
+  left: 50%;
+  top: 8%;
+  transform: translate(-50%, -50%);
+  /* object-fit: cover; */
+  /* object-position: center; */
+}
 .greeting-text {
-  font: 24px Rubik, sans-serif;
+  font: 24px "CustomFont", sans-serif;
 }
 
 .time-display {
@@ -125,7 +137,7 @@ export default {
   align-self: stretch;
   margin-top: 7px;
   width: 100%;
-  font: 64px Rubik, sans-serif;
+  font: 64px "CustomFont", sans-serif;
 }
 
 .sleep-start-section {
@@ -146,25 +158,30 @@ export default {
   color: #1e1e1e;
   white-space: nowrap;
   text-align: center;
-  padding: 62px 64px;
+  /* padding: 62px 64px; */
+  padding: 50px;
 }
 
 .sleep-icon {
-  aspect-ratio: 1.45;
-  object-fit: auto;
+  /* aspect-ratio: 1.0; */
+  opacity: 0.8;
+  object-fit:contain;
   object-position: center;
+  margin: auto;
+  margin-top: -20px;
   width: 100%;
-  margin-left: 12px;
+  /* margin-left: 12px; */
 }
 
 .sleep-text {
   font-family: 'CustomFont', sans-serif;
-  margin-top: 14px;
+  font-size: 20px;
+  margin-top: -10px;
 }
 .footer-actions {
     /* border: 2px solid white; */
     position: absolute;
-    bottom: 0px;
+    bottom: 20px;
     z-index: 10;
     display: flex;
 
@@ -184,7 +201,10 @@ export default {
   margin-top: 11px;
   flex-direction: column;
   flex: 1;
-  padding: 0 20px;
+  cursor: pointer;
+  padding:20px;
+  border-radius: 30px;
+  background-color: rgba(0, 0, 0, 0.157);
 }
 
 .action-icon {

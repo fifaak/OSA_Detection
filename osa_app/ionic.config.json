@@ -1,0 +1,7 @@
+{
+  "name": "osa_app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}

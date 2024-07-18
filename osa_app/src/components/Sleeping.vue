@@ -183,18 +183,20 @@ export default {
     align-self: stretch;
     margin-top: 5px;
     text-align: center;
-    padding: 30px 60px;
+    padding: 17px 40px;
+    width: 70%;
     font: 700 24px 'CustomFont', sans-serif;
     color: #fff;
     text-align: center;
     white-space: nowrap;
     cursor: pointer;
+    font-size: 20px;
     
   }
   .test_btn{
     z-index: 2;
     position: absolute;
-    bottom: 0;
+    bottom: 40px;
   }
   .navigation {
     position: relative;
