@@ -112,20 +112,40 @@ export default {
     inset: 0;
     height: 100%;
     width: 100%;
+    filter: brightness(0.7); /* Adjust brightness level */
+
     object-fit: cover;
     object-position: center;
   }
-  .moon{
+ 
+  .moon {
     top: 53%;
-  left: 50%;
-  text-align: center;
-  transform: translate(-50%, -50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
     position: absolute;
-    margin: 0;
     width: 200px;
     height: 200px;
+    border-radius: 300px;
     z-index: 1;
-  }
+    opacity:0.6;
+    animation: rotateMoon 30s linear infinite; /* Adjust duration and timing function as needed */
+}
+
+@keyframes rotateMoon {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+        box-shadow: 0px 0px 300px yellow;
+    }
+    50%{
+      transform: translate(-50%, -50%) rotate(180deg);
+        box-shadow: 0px 0px 10px yellow;
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg);
+      box-shadow: 0px 0px 300px yellow;
+    }
+}
+
   .top-image {
     aspect-ratio: 9.09;
     object-fit: auto;

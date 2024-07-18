@@ -5,6 +5,8 @@
       <h1 class="alert-message">คุณหยุดหายใจเกิน 25 วินาที !</h1>
       <p class="alert-level">ระดับ เตือน</p>
       <button class="stop-button" @click="navigateToSleeping">กดเพื่อหยุด</button>
+      <button class="test_btn" @click="navigateToSOS">test alert</button>
+
     </div>
   </template>
   
@@ -19,8 +21,12 @@
         const navigateToSleeping = () => {
             router.push('/sleeping');
         }
+        const navigateToSOS = () =>{
+        router.push('/Alert2');
+      }
         return {
-            navigateToSleeping
+            navigateToSleeping,
+            navigateToSOS
         };
     
     }
@@ -43,7 +49,11 @@
     margin: 0 auto;
     /* border: 2px solid black; */
   }
-  
+  .test_btn{
+    z-index: 2;
+    position: absolute;
+    bottom: 40px;
+  }
   .background-image {
     position: absolute;
     inset: 0;
@@ -69,7 +79,7 @@
     position: relative;
     font-family: "CustomFont", sans-serif;
     font-weight: 600;
-    font-size: 22px;
+    font-size: 20px;
     margin-top: 15px;
     margin-bottom:0px;
   }
