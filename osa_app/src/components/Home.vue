@@ -5,7 +5,7 @@
     <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/54afc3a23b4a729daee8341f9d60916b27cadf4fc0b646680ad1a9ee2326274d?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="top-image" alt="" @click="navigateToLogin" />
     <header class="greeting-header">
       <h1 class="greeting-text">{{ greeting }}</h1>
-      <p class="time-display">{{ formattedTime }}</p>
+      <p class="time-display">{{ formattedTime }} น.</p>
     </header>
     <main class="main-content">
       <section class="sleep-start-section" @click="navigateToSleeping">
@@ -14,12 +14,12 @@
       </section>
       <footer class="footer-actions">
         <div class="action-item">
-          <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/be0156c2384f31ea9ae55796cedf39f1cce6313e4893a5f9fdad6f7973f8c4d0?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="action-icon" alt="Breathing icon" />
-          <p class="action-text">การหายใจ</p>
+          <img loading="lazy" src="../assets/Home.png" class="action-icon" alt="Breathing icon" />
+          <!-- <p class="action-text">การหายใจ</p> -->
         </div>
         <div class="action-item">
-          <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/3608c38c5e37b108fb8646888d62b78880c6511ec2e9b9678d1d6ae4ae6acb29?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="action-icon" alt="Statistics icon" />
-          <p class="action-text">สถิติ</p>
+          <img loading="lazy" @click="navigateToDashboard" src="https://cdn.builder.io/api/v1/image/assets/TEMP/3608c38c5e37b108fb8646888d62b78880c6511ec2e9b9678d1d6ae4ae6acb29?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="action-icon" alt="Statistics icon" />
+          <!-- <p class="action-text">สถิติ</p> -->
         </div>
       </footer>
     </main>
@@ -40,7 +40,11 @@ export default {
     const navigateToLogin = () => {
       router.push('/');
     }
+    const navigateToDashboard = ()=>{
+      router.push('/dashboard')
+    }
     const currentTime = ref(new Date());
+
 
     const updateTime = () => {
       currentTime.value = new Date();
@@ -70,7 +74,8 @@ export default {
       formattedTime,
       greeting,
       navigateToSleeping,
-      navigateToLogin
+      navigateToLogin,
+      navigateToDashboard
     };
   }
 };
@@ -104,13 +109,6 @@ export default {
   z-index: -1;
 }
 
-.top-image {
-  aspect-ratio: 9.09;
-  object-fit: auto;
-  object-position: center;
-  width: 344px;
-  max-width: 344px;
-}
 
 .greeting-header {
   position: relative;
@@ -163,23 +161,22 @@ export default {
   font-family: 'CustomFont', sans-serif;
   margin-top: 14px;
 }
-
 .footer-actions {
-  /* border: 2px solid white; */
-  position: absolute; 
-    bottom: -40px; 
+    /* border: 2px solid white; */
+    position: absolute;
+    bottom: 0px;
     z-index: 10;
-  display: flex;
+    display: flex;
 
-  left: 50%;
-  transform: translate(-50%, -50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
 
-  /* width: 100%; */
-  align-items: start;
-  gap: 160px;
-  font-size: 15px;
-  font-weight: 400;
-  white-space: nowrap;
+    /* width: 100%; */
+    align-items: start;
+    gap: 160px;
+    font-size: 15px;
+    font-weight: 400;
+    white-space: nowrap;
 }
 
 .action-item {

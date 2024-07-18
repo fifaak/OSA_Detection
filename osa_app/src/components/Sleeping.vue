@@ -1,30 +1,79 @@
 <!-- Sleeping.vue -->
 <template>
-      <div class="good-night-container">
-        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/f8b3c38ac465a7bc7a71441f87d388fb98da3154f1d74ea3f1e940c5c18ceaf1?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="background-image" alt="" />
-        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/54afc3a23b4a729daee8341f9d60916b27cadf4fc0b646680ad1a9ee2326274d?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="top-image" alt="" />
-        <img class="moon" src="../assets/moon.png" alt="">
-        <header class="header">
-          <h1 class="greeting">Good Night</h1>
-          <p class="time">23:30</p>
-        </header>
-        <main>
-          <p class="status-message">1 Hrs/20 min</p>
-          <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/b6716f6ccbb1c1d439e547792df58a0aa51bd9f1a0c2abe344ba68116c06896f?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="breathing-image" alt="Breathing visualization" />
-          <button class="stop-recording-btn">ยืนยันการตื่นนอน</button>
-        </main>
+  <div class="good-night-container">
+    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/f8b3c38ac465a7bc7a71441f87d388fb98da3154f1d74ea3f1e940c5c18ceaf1?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="background-image" alt="" />
+    <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/54afc3a23b4a729daee8341f9d60916b27cadf4fc0b646680ad1a9ee2326274d?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="top-image" alt="" />
+    <img class="moon" src="../assets/moon.png" alt="">
+    <header class="header">
+      <p class="time">{{ formattedTime }}</p>
+    </header>
+    <main>
+      <p class="status-message" v-html="formattedElapsedTime"></p>
+      <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/b6716f6ccbb1c1d439e547792df58a0aa51bd9f1a0c2abe344ba68116c06896f?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="breathing-image" alt="Breathing visualization" />
+      <button class="stop-recording-btn" @click="stopTimer">ยืนยันการตื่นนอน</button>
+    </main>
+    <button class="test_btn" @click="navigateToAlert">test alert</button>
+  </div>
+</template>
 
-      </div>
-  
-  </template>
-  <script>
-  export default {
-    name: 'Sleeping',
-    mounted() {
-    console.log('Sleeping component mounted');
+<script>
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import router from '../router';
+
+export default {
+  name: 'Sleeping',
+  setup() {
+    const currentTime = ref(new Date());
+    const startTime = ref(new Date());
+    const elapsedTime = ref(0);
+
+    const updateTime = () => {
+      currentTime.value = new Date();
+      elapsedTime.value = Math.floor((currentTime.value - startTime.value) / 1000);
+    };
+
+    const formattedTime = computed(() => {
+      const hours = currentTime.value.getHours().toString().padStart(2, '0');
+      const minutes = currentTime.value.getMinutes().toString().padStart(2, '0');
+      //const seconds = currentTime.value.getSeconds().toString().padStart(2, '0');
+      return `${hours}:${minutes}น.`;
+    });
+
+    const formattedElapsedTime = computed(() => {
+      const hours = Math.floor(elapsedTime.value / 3600);
+      const minutes = Math.floor((elapsedTime.value % 3600) / 60);
+      const seconds = elapsedTime.value % 60;
+      return `นอน ${hours} ชม. <br> ${minutes} นาที : ${seconds}วินาที`;
+    });
+
+    let timer;
+
+    onMounted(() => {
+      console.log('Sleeping component mounted');
+      timer = setInterval(updateTime, 1000);
+    });
+
+    onUnmounted(() => {
+      clearInterval(timer);
+    });
+    const navigateToAlert = () =>{
+      router.push('/Alert1');
+    }
+    const stopTimer = () => {
+      clearInterval(timer);
+      router.push('/Dashboard');
+      // Add any additional logic for when sleep is stopped
+    };
+
+    return {
+      formattedTime,
+      formattedElapsedTime,
+      stopTimer,
+      navigateToAlert
+    };
   }
-  }
-  </script>
+}
+</script>
   <style scoped>
 .good-night-container {
   display: flex;
@@ -142,7 +191,11 @@
     cursor: pointer;
     
   }
-  
+  .test_btn{
+    z-index: 2;
+    position: absolute;
+    bottom: 0;
+  }
   .navigation {
     position: relative;
     align-self: stretch;
