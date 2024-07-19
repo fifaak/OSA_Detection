@@ -7,7 +7,7 @@
         <p class="alert-severity">ระดับ วิกฤต</p>
       </header>
       <main class="alert-main">
-        <button class="confirm-button">ยืนยัน ช่วยสำเร็จ</button>
+        <button class="confirm-button" @click="navigateToSleeping">ยืนยัน ช่วยสำเร็จ</button>
         <p class="system-message">
           <span class="light-text">ระบบกำลังติดต่อ</span><br />ข้อความช่วยเหลือ
         </p>
@@ -24,22 +24,43 @@
       </footer>
     </div>
   </template>
-  
+    <script>
+
+    // import { ref, computed, onMounted, onUnmounted } from 'vue';
+    import { useRouter } from 'vue-router';
+    export default {
+    name: 'Alert2',
+    setup() {
+        const router = useRouter();
+        const navigateToSleeping = () => {
+            router.push('/sleeping');
+        }
+        const navigateToSOS = () =>{
+        router.push('/Alert2');
+      }
+        return {
+            navigateToSleeping,
+            navigateToSOS
+        };
+    
+    }
+}
+  </script>
   <style scoped>
   .sos-alert {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border: 1px solid #000;
-    position: relative;
+    /* position: absolute; */
     aspect-ratio: 0.46;
-    max-width: 480px;
+    /* max-width: 480px; */
     width: 100%;
+    padding: 0;
     align-items: center;
-    font-size: 24px;
     color: #fff;
+    font-weight: 800;
     margin: 0 auto;
-    padding: 80px 34px 22px;
+    /* border: 2px solid black; */
   }
   
   .background-image {
@@ -54,51 +75,66 @@
   .alert-header {
     position: relative;
     text-align: center;
+    margin: 0px;
   }
   
   .alert-title {
     -webkit-text-stroke: 5px #000;
-    border: 5px solid #000;
-    margin-top: 183px;
-    font: 400 96px Spinnaker, sans-serif;
+    /* border: 5px solid #000; */
+    /* margin-top: 183px; */
+    font: 400 120px "CustomFont", sans-serif;
+    margin: 40px 0;
   }
   
   .alert-message {
     color: rgba(255, 255, 255, 0.7);
-    font: 600 24px Rubik, sans-serif;
+    font: 600 24px "CustomFont", sans-serif;
     margin-top: 36px;
+    margin-bottom: 0px;
   }
   
   .alert-severity {
     color: #fc0;
-    font: 900 36px Rubik, sans-serif;
-    margin-top: 7px;
+    font: 900 36px "CustomFont", sans-serif;
+    margin-top: 0px;
   }
   
   .alert-main {
     position: relative;
     width: 100%;
+    text-align: center;
   }
   
   .confirm-button {
+    position: relative;
     -webkit-text-stroke: 1px rgba(0, 0, 0, 0.3);
-    font: 700 24px Rubik, sans-serif;
+    font-family: "CustomFont", sans-serif;
     border: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: 30px;
     background-color: #000;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-    width: 100%;
-    margin-top: 71px;
-    padding: 32px 60px;
-    color: #fff;
+    align-self: stretch;
+    margin-top: 78px;
+    font-weight: 700;
+    width:80%;
+    text-align: center;
+    color:white;
+    font-size: 20px;
+    font-family: "CustomFont", sans-serif;
+    white-space: nowrap;
+    text-align: center;
+    padding: 27px 40px;
+    margin-top: 150px;
+    margin-bottom: -90px;
     cursor: pointer;
   }
   
   .system-message {
     text-align: center;
-    font: 600 24px Rubik, sans-serif;
-    margin-top: 90px;
-    width: 295px;
+    font: 600 18px "CustomFont", sans-serif;
+    margin-top: 60px;
+    width: 100%;
+    /* border: 2px solid black; */
   }
   
   .light-text {
@@ -106,8 +142,10 @@
   }
   
   .contact-list {
+    z-index: 2;
     display: flex;
-    margin-top: 24px;
+    margin-top: 0px;
+    text-align: center;
     gap: 20px;
     font-size: 13px;
     color: #fc0;
@@ -118,6 +156,7 @@
     flex-direction: column;
     align-items: center;
     flex: 1;
+ 
   }
   
   .contact-image {
@@ -128,7 +167,7 @@
   }
   
   .contact-label {
-    font: 300 13px Rubik, sans-serif;
+    font: 300 13px "CustomFont", sans-serif;
     margin-top: 10px;
   }
   </style>

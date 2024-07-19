@@ -1,14 +1,13 @@
 {
   "name": "osa_app",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "private": true,
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
+    "dev": "vite",
     "ionic:build": "npm run build",
-    "ionic:serve": "vite dev --host"
+    "ionic:serve": "vite dev --host",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@capacitor/cli": "^6.1.1",
@@ -16,12 +15,15 @@
     "@capacitor/ios": "6.1.1",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
+    "register-service-worker": "^1.7.2",
     "vue": "^3.4.31",
     "vue-chartjs": "^5.3.1",
     "vue-router": "^4.4.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
+    "@vue/cli-plugin-pwa": "~5.0.0",
     "vite": "^5.3.4"
-  }
+  },
+  "type": "module"
 }
