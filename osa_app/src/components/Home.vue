@@ -12,14 +12,23 @@
         <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/d2d95dc68ad82486c0a84439e3cdfc1d5b8de6bcb3f140154d61f9e3090e3cd8?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="sleep-icon" alt="Sleep icon" />
         <p class="sleep-text">เริ่มนอน</p>
       </section>
+      <section class="sensor-selector">
+        <p id="connection_type">
+          <input type="radio" id="ble" name="type" value="1" checked>
+          <label id="ble_label" for="ble">Bluetooth</label>
+          <input type="radio" id="usb" name="type" value="0">
+          <label id="usb_label" for="usb">USB</label><br>
+        </p>
+        <button id="select_device" @click="selectDevice">Select a Go Direct Device</button>
+        <div id="error" v-html="error"></div>
+        <pre id="output">{{ output }}</pre>
+      </section>
       <footer class="footer-actions">
         <div class="action-item">
           <img loading="lazy" src="../assets/Home.png" class="action-icon" alt="Breathing icon" />
-          <!-- <p class="action-text">การหายใจ</p> -->
         </div>
         <div class="action-item">
           <img loading="lazy" @click="navigateToDashboard" src="https://cdn.builder.io/api/v1/image/assets/TEMP/3608c38c5e37b108fb8646888d62b78880c6511ec2e9b9678d1d6ae4ae6acb29?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="action-icon" alt="Statistics icon" />
-          <!-- <p class="action-text">สถิติ</p> -->
         </div>
       </footer>
     </main>
@@ -29,31 +38,44 @@
 <script>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-
+import "./Home.css"
 export default {
   name: 'SleepingView',
   setup() {
     const router = useRouter();
+    const godirect = ref(null);
+    const currentTime = ref(new Date());
+    const error = ref('');
+    const output = ref('');
+
     const navigateToSleeping = () => {
       router.push('/sleeping');
     };
     const navigateToLogin = () => {
       router.push('/');
     }
-    const navigateToDashboard = ()=>{
-      router.push('/dashboard')
+    const navigateToDashboard = () => {
+      router.push('/dashboard');
     }
-    const currentTime = ref(new Date());
-
 
     const updateTime = () => {
       currentTime.value = new Date();
     };
 
-    onMounted(() => {
+    onMounted(async () => {
       updateTime();
       const timer = setInterval(updateTime, 1000);
       onUnmounted(() => clearInterval(timer));
+
+      try {
+        const gdModule = await import('@vernier/godirect');
+        godirect.value = gdModule.default;
+        console.log("Go Direct library loaded:", godirect.value);
+        initializeDeviceSupport();
+      } catch (err) {
+        console.error("Failed to load Go Direct library:", err);
+        error.value = "Failed to load Go Direct library";
+      }
     });
 
     const formattedTime = computed(() => {
@@ -70,153 +92,123 @@ export default {
       return 'Good Night';
     });
 
+    const initializeDeviceSupport = () => {
+      const usbBtn = document.querySelector('#usb');
+      const usbLabel = document.querySelector('#usb_label');
+      const bleBtn = document.querySelector('#ble');
+      const bleLabel = document.querySelector('#ble_label');
+
+      if (navigator.bluetooth && typeof navigator.bluetooth.getAvailability === 'function') {
+        navigator.bluetooth.getAvailability().then((available) => {
+          if (available) {
+            bleLabel.innerHTML = `Bluetooth: RD`;
+            console.log("Bluetooth: ready");
+          } else {
+            bleLabel.innerHTML = `Bluetooth <span style="color:red">Not Available</span>`;
+            bleBtn.disabled = true;
+          }
+        });
+      } else {
+        bleLabel.innerHTML = `Bluetooth <span style="color:red">Not Supported</span>`;
+        bleBtn.disabled = true;
+      }
+
+      if (navigator.usb) {
+        usbLabel.innerHTML = `USB: RD`;
+      } else {
+        usbLabel.innerHTML = `USB <span style="color:red">Not Supported</span>`;
+        usbBtn.disabled = true;
+      }
+
+      if (!navigator.bluetooth && !navigator.usb) {
+        document.querySelector('#select_device').style.display = 'none';
+      }
+    };
+
+    const selectDevice = async () => {
+  if (!godirect.value) {
+    console.error("Go Direct library not loaded yet");
+    error.value = "Go Direct library not loaded yet";
+    return;
+  }
+  const bluetooth = document.querySelector('input[name="type"]:checked').value === "1";
+  console.log("clicked");
+  error.value = "";
+  try {
+    let device;
+    if (bluetooth) {
+      device = await godirect.value.selectDevice();
+    } else {
+      device = await godirect.value.selectDevice({ usb: true });
+    }
+
+    if (device) {
+      // Check if the device is already open
+      if (device.isConnected) {
+        console.log(`Device ${device.name} is already connected. Disconnecting...`);
+        await device.close();
+        console.log(`Device ${device.name} disconnected.`);
+      }
+
+      output.value += `\n Connected to ${device.name}`;
+      output.value += `\n Reading measurements \n`;
+
+      try {
+        await device.open();
+      } catch (openError) {
+        if (openError.message.includes('already open')) {
+          console.log(`Device ${device.name} was already open. Proceeding with existing connection.`);
+        } else {
+          throw openError;
+        }
+      }
+
+      device.on('device-closed', () => {
+        output.value += `\n\n Disconnected from ${device.name}\n`;
+      });
+
+      const sensorDataHandler = (sensor) => {
+        const currentTimestamp = new Date();
+        const timeString = `${currentTimestamp.getHours().toString().padStart(2, '0')}:${currentTimestamp.getMinutes().toString().padStart(2, '0')}:${currentTimestamp.getSeconds().toString().padStart(2, '0')}`;
+        console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
+        output.value += `\n Time: ${timeString}, Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`;
+      };
+
+      device.sensors.forEach(sensor => {
+        sensor.setEnabled(true);
+      });
+
+      const intervalId = setInterval(() => {
+        device.sensors.forEach(sensor => {
+          sensorDataHandler(sensor);
+        });
+      }, 500); // Sample every 0.5 seconds
+
+      onUnmounted(() => clearInterval(intervalId));
+    } else {
+      error.value = "No device found";
+    }
+  } catch (err) {
+    console.error(err);
+    error.value += "\n " + err;
+    if (err.toString().includes('cross-origin')) {
+      error.value += '\n<p><b>Are you running in an embedded iframe? Try running this example in its own window.</b></p>';
+    }
+  }
+};
+
+
     return {
       formattedTime,
       greeting,
       navigateToSleeping,
       navigateToLogin,
-      navigateToDashboard
+      navigateToDashboard,
+      selectDevice,
+      error,
+      output
     };
   }
 };
 </script>
 
-
-<style scoped>
-.good-night-container {
-  /* padding-top:50px; */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  /* position: absolute; */
-  aspect-ratio: 0.46;
-  /* max-width: 480px; */
-  width: 100%;
-  /* padding: 0; */
-  align-items: center;
-  color: #fff;
-  font-weight: 800;
-  margin: 0 auto;
-  /* border: 2px solid black; */
-}
-
-.background-image {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  object-position: center;
-  z-index: -1;
-}
-
-
-.greeting-header {
-  position: relative;
-  text-align: center;
-  margin-top: 60px;
-}
-.top-image{
-  position: absolute;
-  inset: 0;
-  height: auto;
-  width: 80%;
-
-  left: 50%;
-  top: 8%;
-  transform: translate(-50%, -50%);
-  /* object-fit: cover; */
-  /* object-position: center; */
-}
-.greeting-text {
-  font: 24px "CustomFont", sans-serif;
-}
-
-.time-display {
-  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  align-self: stretch;
-  margin-top: 7px;
-  width: 100%;
-  font: 64px "CustomFont", sans-serif;
-}
-
-.sleep-start-section {
-  position: absolute;
-  /* border: 5px solid rgba(0, 0, 0, 1); */
-  box-shadow: 0 14px 14px 0 rgba(0, 0, 0, 0.25) inset;
-  background-color: #fff;
-  border-radius: 50%;
-  display: flex;
-  margin-top: 205px;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 130px;
-  height: 130px;
-  flex-direction: column;
-  font-size: 32px;
-  color: #1e1e1e;
-  white-space: nowrap;
-  text-align: center;
-  /* padding: 62px 64px; */
-  padding: 50px;
-}
-
-.sleep-icon {
-  /* aspect-ratio: 1.0; */
-  opacity: 0.8;
-  object-fit:contain;
-  object-position: center;
-  margin: auto;
-  margin-top: -20px;
-  width: 100%;
-  /* margin-left: 12px; */
-}
-
-.sleep-text {
-  font-family: 'CustomFont', sans-serif;
-  font-size: 20px;
-  margin-top: -10px;
-}
-.footer-actions {
-    /* border: 2px solid white; */
-    position: absolute;
-    bottom: 20px;
-    z-index: 10;
-    display: flex;
-
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    /* width: 100%; */
-    align-items: start;
-    gap: 160px;
-    font-size: 15px;
-    font-weight: 400;
-    white-space: nowrap;
-}
-
-.action-item {
-  display: flex;
-  margin-top: 11px;
-  flex-direction: column;
-  flex: 1;
-  cursor: pointer;
-  padding:20px;
-  border-radius: 30px;
-  background-color: rgba(0, 0, 0, 0.157);
-}
-
-.action-icon {
-  aspect-ratio: 0.94;
-  object-fit: auto;
-  object-position: center;
-  width: 36px;
-  align-self: center;
-}
-
-.action-text {
-  font-family: 'CustomFont', sans-serif;
-  margin-top: 5px;
-}
-</style>
