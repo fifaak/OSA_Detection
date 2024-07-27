@@ -15,6 +15,10 @@
             margin-top: 20px;
             display: inline-block;
         }
+        #error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -89,8 +93,8 @@
                     sensor.on('value-changed', (sensor) => {
                         if (recording) {
                             console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
-                            output.textContent += `\n Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`;
-                            sensorData.push({ time: Date.now(), value: sensor.value });
+                            //output.textContent += `\n Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`;
+                            sensorData.push({ value: sensor.value });
                         }
                     });
                 });
@@ -123,8 +127,9 @@
 
         const sendSensorData = async () => {
             console.log("Sending sensor data");
-            const csvContent = "time,value\n" +
-                sensorData.map(e => `${e.time},${e.value}`).join("\n");
+            let sec = 0;
+            const csvContent = "sec,temp\n" +
+                sensorData.map(e => `${(sec += 0.5)},${e.value}`).join("\n");
             const blob = new Blob([csvContent], { type: 'text/csv' });
             const formData = new FormData();
             formData.append('file', blob, 'sensor_data.csv');
@@ -149,13 +154,15 @@
                 result.innerText = `Fetch error: ${error}`;
             }
 
+            // Reset sensor data to avoid duplication
             sensorData = [];
         };
 
         const downloadCSV = (data) => {
             console.log("Downloading CSV");
-            const csvContent = "time,value\n" +
-                data.map(e => `${e.time},${e.value}`).join("\n");
+            let sec = 0;
+            const csvContent = "sec,temp\n" +
+                data.map(e => `${(sec += 0.5)},${e.value}`).join("\n");
             const blob = new Blob([csvContent], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -169,6 +176,12 @@
 
         selectDeviceBtn.addEventListener('click', selectDevice);
         startRecordBtn.addEventListener('click', startRecording);
+
+        // Prevent any accidental form submission or page refresh
+        window.addEventListener('beforeunload', function(event) {
+            event.preventDefault();
+            event.returnValue = '';
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction App</title>
+    <style>
+        /* Add some styling to make sure result area is visible */
+        #result {
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Predict from CSV</h1>
+    <input type="file" id="fileInput">
+    <button id="predictButton">Predict</button>
+    <p id="result"></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            console.log("DOM fully loaded and parsed");
+            const predictButton = document.getElementById('predictButton');
+            predictButton.addEventListener('click', makePrediction);
+
+            async function makePrediction() {
+                console.log("makePrediction function called");
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput.files[0];
+                const maxLength = 51; // Adjust as needed
+
+                if (!file) {
+                    alert("Please select a file first.");
+                    return;
+                }
+
+                console.log("File selected:", file.name);
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('max_length', maxLength);
+
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/predict', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+                    console.log('Response:', data); // Log the response
+                    if (response.ok) {
+                        document.getElementById('result').innerText = `Predictions: ${data.predictions}`;
+                        console.log('Prediction displayed'); // Log when the prediction is displayed
+                    } else {
+                        console.error('Error response:', data); // Log error responses
+                        document.getElementById('result').innerText = `Error: ${data.error}`;
+                    }
+                } catch (error) {
+                    console.error('Fetch error:', error); // Log fetch errors
+                    document.getElementById('result').innerText = `Fetch error: ${error}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
