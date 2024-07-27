@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction App</title>
+    <style>
+        /* Add some styling to make sure result area is visible */
+        #result {
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Predict from CSV</h1>
+    <p id="connection_type">
+        <input type="radio" id="ble" name="type" value="1" checked>
+        <label id="ble_label" for="ble">Bluetooth</label>
+        <input type="radio" id="usb" name="type" value="0">
+        <label id="usb_label" for="usb">USB</label><br>
+    </p>
+    <button id="select_device">Select a Go Direct Device</button>
+    <button id="start_record">Start Recording</button>
+    <div id="error"></div>
+    <pre id="output"></pre>
+    <p id="result"></p>
+
+    <script src="/backend/Godirect_script.js"></script>
+    <script>
+        const usbBtn = document.querySelector('#usb');
+        const usbLabel = document.querySelector('#usb_label');
+        const bleBtn = document.querySelector('#ble');
+        const bleLabel = document.querySelector('#ble_label');
+        const selectDeviceBtn = document.querySelector('#select_device');
+        const startRecordBtn = document.querySelector('#start_record');
+        const output = document.querySelector('#output');
+        const error = document.querySelector('#error');
+        const result = document.querySelector('#result');
+
+        let gdxDevice;
+        let sensorData = [];
+        let intervalId;
+        let recording = false;
+
+        if (navigator.bluetooth) {
+            bleLabel.innerHTML = `Bluetooth`;
+        } else {
+            if (navigator.hid) usbBtn.checked = true;
+            bleLabel.innerHTML = `Bluetooth <span style="color:red">Not Supported</span> <a href="https://webbluetoothcg.github.io/web-bluetooth/">More information</a>`;
+            bleBtn.disabled = true;
+        }
+
+        if (navigator.hid) {
+            usbLabel.innerHTML = `USB`;
+        } else {
+            if (navigator.bluetooth) bleBtn.checked = true;
+            usbLabel.innerHTML = `USB <span style="color:red">Not Supported</span> <a href="https://wicg.github.io/webhid/">More information</a>`;
+            usbBtn.disabled = true;
+        }
+
+        if (!navigator.bluetooth && !navigator.hid) {
+            selectDeviceBtn.style.visibility = 'hidden';
+        }
+
+        const selectDevice = async (event) => {
+            event.preventDefault();
+            const bluetooth = document.querySelector('input[name="type"]:checked').value === "1";
+            error.textContent = "";
+            try {
+                gdxDevice = await godirect.selectDevice(bluetooth);
+
+                output.textContent += `\n Connected to ` + gdxDevice.name;
+                output.textContent += `\n Reading measurements \n`;
+
+                gdxDevice.on('device-closed', () => {
+                    output.textContent += `\n\n Disconnected from ` + gdxDevice.name + `\n`;
+                });
+
+                gdxDevice.enableDefaultSensors();
+                const enabledSensors = gdxDevice.sensors.filter(s => s.enabled);
+
+                enabledSensors.forEach(sensor => {
+                    sensor.on('value-changed', (sensor) => {
+                        if (recording) {
+                            console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
+                            output.textContent += `\n Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`;
+                            sensorData.push({ time: Date.now(), value: sensor.value });
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error(err);
+                error.innerText += "\n " + err;
+                if (err.toString().includes('cross-origin')) {
+                    error.innerHTML += '\n<p><b>Are you running in an embedded iframe? Try running this example in its own window.</b></p>'
+                }
+            }
+        };
+
+        const startRecording = (event) => {
+            event.preventDefault();
+            if (!gdxDevice) {
+                alert("Please select a Go Direct device first.");
+                return;
+            }
+            sensorData = [];
+            recording = true;
+            console.log("Recording started");
+            intervalId = setInterval(() => {
+                if (sensorData.length > 0) {
+                    console.log("25 seconds passed, sending data");
+                    sendSensorData();
+                    downloadCSV(sensorData);
+                }
+            }, 25000);
+        };
+
+        const sendSensorData = async () => {
+            console.log("Sending sensor data");
+            const csvContent = "time,value\n" +
+                sensorData.map(e => `${e.time},${e.value}`).join("\n");
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const formData = new FormData();
+            formData.append('file', blob, 'sensor_data.csv');
+            formData.append('max_length', '51');
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                console.log('Response:', data);
+                if (response.ok) {
+                    result.innerText = `Predictions: ${data.predictions}`;
+                } else {
+                    console.error('Error response:', data);
+                    result.innerText = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                result.innerText = `Fetch error: ${error}`;
+            }
+
+            sensorData = [];
+        };
+
+        const downloadCSV = (data) => {
+            console.log("Downloading CSV");
+            const csvContent = "time,value\n" +
+                data.map(e => `${e.time},${e.value}`).join("\n");
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `sensor_data_${Date.now()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        selectDeviceBtn.addEventListener('click', selectDevice);
+        startRecordBtn.addEventListener('click', startRecording);
+    </script>
+</body>
+</html>
