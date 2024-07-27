@@ -144,7 +144,7 @@
                 const data = await response.json();
                 console.log('Response:', data);
                 if (response.ok) {
-                    result.innerText = `Predictions: ${data.predictions}`;
+                    result.innerText = `state: ${data.state}`;
                 } else {
                     console.error('Error response:', data);
                     result.innerText = `Error: ${data.error}`;

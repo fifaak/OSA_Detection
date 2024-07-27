@@ -17,6 +17,8 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 MODEL_PATH = '../model2/catboost_model.cbm'
 SCALER_PATH = '../model2/scaler.pkl'
 
+state = 0  # Initialize the state variable
+
 def load_data_from_csv(file_path, max_length):
     df = pd.read_csv(file_path)
     df.columns = ['sec', 'temp']
@@ -34,12 +36,38 @@ def predict_single_csv(file_path, max_length, model_path=MODEL_PATH, scaler_path
     data = load_data_from_csv(file_path, max_length)
     data = scaler.transform(data.reshape(-1, data.shape[-1])).reshape(data.shape)
     predictions = model.predict(data)
-    if (predictions[0] == 1 or ((df['temp'].max()-df['temp'].min())<0.5)):
-      predictions[0] = 1
+    if (predictions[0] == 1 or ((df['temp'].max() - df['temp'].min()) < 0.5)):
+        predictions[0] = 1
     return predictions
+
+def warning():
+    print("warning")
+
+def sos():
+    print("sos")
+
+def workflow(csv_path):
+    global state  # Ensure state is recognized as a global variable
+
+    pred = predict_single_csv(csv_path, max_length=51)
+    if (pred == 1 and state == 0):
+        warning()
+        state = 1
+        return "Warning"
+    elif (pred == 1 and state == 1):
+        sos()
+        state = 2
+        return "SOS"
+    elif (pred == 0 and state == 1):
+        state = 0
+        return "Normal"
+    else:
+        return state
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    global state  # Use the global state variable
+
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
@@ -49,11 +77,10 @@ def predict():
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(file_path)
     
-    max_length = int(request.form.get('max_length', 51))
-    predictions = predict_single_csv(file_path, max_length)
+    new_state = workflow(file_path)
     os.remove(file_path)  # Clean up the uploaded file after processing
-    print(predictions)
-    return jsonify({'predictions': predictions.tolist()})
+    
+    return jsonify({'state': new_state})
 
 if __name__ == '__main__':
     app.run(debug=True)
