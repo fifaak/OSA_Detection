@@ -266,6 +266,9 @@ export default {
 
         if (response.status === 200) {
           result.value = `state: ${response.data.state}`;
+          if (response.data.state === 'Warning') {
+            router.push('/Alert1');
+          }
         } else {
           console.error('Error response:', response.data);
           result.value = `Error: ${response.data.error}`;

@@ -1,3 +1,4 @@
+<!-- Alert2.vue -->
 <template>
     <div class="sos-alert">
       <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/9452a1ddf71b262acb33814e6c34f332bc9a99a3d4fc21eef5a71740e4b3aa2a?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="background-image" alt="Emergency background" />
