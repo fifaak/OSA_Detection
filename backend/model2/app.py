@@ -62,7 +62,8 @@ def workflow(csv_path):
         state = 0
         return "Normal"
     else:
-        return state
+        state = 2
+        return "SOS!"
 
 @app.route('/predict', methods=['POST'])
 def predict():

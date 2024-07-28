@@ -21,8 +21,8 @@
         <div id="error" v-html="error"></div>
         <pre id="output">{{ output }}</pre>
         <button @click="startSampling" style="padding: 10px;z-index: 30;cursor: pointer;">Start Sampling</button>
+        <p id="result">{{ result }}</p>
       </section>
-      
     </main>
     <button class="test_btn" @click="navigateToAlert">test alert</button>
   </div>
@@ -31,7 +31,8 @@
 <script>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import router from '../router';
-import "./Sleeping.css"
+import axios from 'axios';
+import "./Sleeping.css";
 
 export default {
   name: 'Sleeping',
@@ -41,10 +42,12 @@ export default {
     const elapsedTime = ref(0);
     const error = ref('');
     const output = ref('');
+    const result = ref('');
     const godirect = ref(null);
     let device = null;
     let samplingInterval = null;
-    const data = [];
+    let predictionInterval = null;
+    const sensorData = ref([]);
 
     const updateTime = () => {
       currentTime.value = new Date();
@@ -88,29 +91,25 @@ export default {
       if (samplingInterval) {
         clearInterval(samplingInterval);
       }
+      if (predictionInterval) {
+        clearInterval(predictionInterval);
+      }
     });
 
     const navigateToAlert = () => {
       router.push('/Alert1');
     };
 
-    const saveToCSV = () => {
-      const csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "sensor_data.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
-
     const stopTimer = () => {
       clearInterval(timer);
       if (samplingInterval) {
         clearInterval(samplingInterval);
-        saveToCSV();
       }
+      if (predictionInterval) {
+        clearInterval(predictionInterval);
+      }
+      saveToCSV();
+      sendSensorData();
       router.push('/Dashboard');
     };
 
@@ -204,18 +203,15 @@ export default {
       }
 
       startTime.value = new Date();
-
-      const headers = ["Timestamp", "Seconds", "Temperature"];
-      data.push(headers);
+      sensorData.value = [];
 
       let seconds = 0;
 
       const sensorDataHandler = (sensor) => {
         if (sensor.name.toLowerCase().includes('temperature')) {
-          const currentTimestamp = new Date().toISOString();
           seconds += 0.5;
-          console.log(`Timestamp: ${currentTimestamp}, Seconds: ${seconds}, Temperature: ${sensor.value}`);
-          data.push([currentTimestamp, seconds.toFixed(1), sensor.value]);
+          console.log(`Seconds: ${seconds}, Temperature: ${sensor.value}`);
+          sensorData.value.push([seconds.toFixed(1), sensor.value]);
         }
       };
 
@@ -229,7 +225,68 @@ export default {
         });
       }, 500); // Sample every 0.5 seconds
 
-      onUnmounted(() => clearInterval(samplingInterval));
+      predictionInterval = setInterval(() => {
+        sendSensorData();
+      }, 25000); // Predict every 25 seconds
+
+      onUnmounted(() => {
+        clearInterval(samplingInterval);
+        clearInterval(predictionInterval);
+      });
+    };
+
+    const saveToCSV = () => {
+      console.log("Downloading CSV");
+      const csvContent = "sec,temp\n" + sensorData.value.map(e => e.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `sensor_data_${Date.now()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    const sendSensorData = async () => {
+      console.log("Sending sensor data");
+      const csvContent = "sec,temp\n" + sensorData.value.map(e => e.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const formData = new FormData();
+      formData.append('file', blob, 'sensor_data.csv');
+      formData.append('max_length', '51');
+
+      try {
+        const response = await axios.post('http://127.0.0.1:5000/predict', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        if (response.status === 200) {
+          result.value = `state: ${response.data.state}`;
+        } else {
+          console.error('Error response:', response.data);
+          result.value = `Error: ${response.data.error}`;
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        if (error.response) {
+          console.error('Response data:', error.response.data);
+          console.error('Response status:', error.response.status);
+          console.error('Response headers:', error.response.headers);
+        } else if (error.request) {
+          console.error('Request data:', error.request);
+        } else {
+          console.error('Error message:', error.message);
+        }
+        result.value = `Fetch error: ${error.message}`;
+      }
+
+      // Retain only the last 25 seconds of data
+      const last25SecondsData = sensorData.value.slice(-50); // 50 samples for 25 seconds
+      sensorData.value = last25SecondsData;
     };
 
     return {
@@ -241,7 +298,25 @@ export default {
       startSampling,
       error,
       output,
+      result
     };
   }
-}
+};
 </script>
+
+<style>
+/* Add some styling to make sure result area is visible */
+#result {
+  font-size: 18px;
+  font-weight: bold;
+  color: green;
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin-top: 20px;
+  display: inline-block;
+}
+#error {
+  color: red;
+  font-weight: bold;
+}
+</style>
