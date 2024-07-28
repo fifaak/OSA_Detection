@@ -119,23 +119,28 @@ export default {
       const bleBtn = document.querySelector('#ble');
       const bleLabel = document.querySelector('#ble_label');
 
+      // Check Bluetooth availability
       if (navigator.bluetooth && typeof navigator.bluetooth.getAvailability === 'function') {
         navigator.bluetooth.getAvailability().then((available) => {
           if (available) {
-            bleLabel.innerHTML = `Bluetooth: RD`;
-            console.log("Bluetooth: ready");
+            bleLabel.innerHTML = `Bluetooth`;
           } else {
             bleLabel.innerHTML = `Bluetooth <span style="color:red">Not Available</span>`;
             bleBtn.disabled = true;
           }
+        }).catch((error) => {
+          console.error("Error checking Bluetooth availability:", error);
+          bleLabel.innerHTML = `Bluetooth <span style="color:red">Error</span>`;
+          bleBtn.disabled = true;
         });
       } else {
         bleLabel.innerHTML = `Bluetooth <span style="color:red">Not Supported</span>`;
         bleBtn.disabled = true;
       }
 
+      // Check USB availability
       if (navigator.usb) {
-        usbLabel.innerHTML = `USB: RD`;
+        usbLabel.innerHTML = `USB`;
       } else {
         usbLabel.innerHTML = `USB <span style="color:red">Not Supported</span>`;
         usbBtn.disabled = true;

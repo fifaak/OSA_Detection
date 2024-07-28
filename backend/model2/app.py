@@ -48,22 +48,12 @@ def sos():
 
 def workflow(csv_path):
     global state  # Ensure state is recognized as a global variable
-
     pred = predict_single_csv(csv_path, max_length=51)
     if (pred == 1 and state == 0):
         warning()
-        state = 1
-        return "Warning"
-    elif (pred == 1 and state == 1):
-        sos()
-        state = 2
-        return "SOS"
-    elif (pred == 0 and state == 1):
         state = 0
-        return "Normal"
-    else:
-        state = 2
-        return "SOS!"
+        return "Warning"
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
