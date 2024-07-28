@@ -73,7 +73,7 @@
     object-fit: contain;
     object-position: center;
     margin: auto;
-    margin-top: -20px;
+    margin-top: 10px;
     width: 100%;
   }
   
@@ -98,6 +98,7 @@
     bottom: 20px;
     z-index: 10;
     display: flex;
+    top:90%;
     left: 50%;
     transform: translate(-50%, -50%);
     align-items: start;

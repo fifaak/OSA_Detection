@@ -9,22 +9,24 @@
     <main>
       <p class="status-message" v-html="formattedElapsedTime"></p>
       <button class="stop-recording-btn" @click="stopTimer">ยืนยันการตื่นนอน</button>
+      <button @click="startSampling" class="start-recording-btn" style="z-index: 1;">เริ่มนอน</button>
       
       <section class="sensor-selector">
         <p id="connection_type">
           <input type="radio" id="ble" name="type" value="1" checked>
-          <label id="ble_label" for="ble">Bluetooth</label>
-          <input type="radio" id="usb" name="type" value="0">
-          <label id="usb_label" for="usb">USB</label><br>
+          <!-- <label id="ble_label" for="ble">Bluetooth</label> -->
+          <!-- <input type="radio" id="usb" name="type" value="0"> -->
+          <!-- <label id="usb_label" for="usb">USB</label><br> -->
         </p>
-        <button id="select_device" @click="selectDevice">Select a Go Direct Device</button>
-        <div id="error" v-html="error"></div>
+        <button id="select_device" @click="selectDevice">
+          <img src="../assets/search.png" width="100%" alt="">
+        </button>
+        <!-- <div id="error" v-html="error"></div> -->
         <pre id="output">{{ output }}</pre>
-        <button @click="startSampling" style="padding: 10px;z-index: 30;cursor: pointer;">Start Sampling</button>
-        <p id="result">{{ result }}</p>
+        <!-- <p id="result">{{ result }}</p> -->
       </section>
     </main>
-    <button class="test_btn" @click="navigateToAlert">test alert</button>
+    <!-- <button class="test_btn" @click="navigateToAlert">test alert</button> -->
   </div>
 </template>
 
@@ -48,6 +50,8 @@ export default {
     let samplingInterval = null;
     let predictionInterval = null;
     const sensorData = ref([]);
+
+    const startRecordingBtn = ref(null);
 
     const updateTime = () => {
       currentTime.value = new Date();
@@ -207,6 +211,8 @@ export default {
         return;
       }
 
+      startRecordingBtn.value.style.zIndex = '-1';
+
       startTime.value = new Date();
       sensorData.value = [];
 
@@ -306,7 +312,8 @@ export default {
       startSampling,
       error,
       output,
-      result
+      result,
+      startRecordingBtn,
     };
   }
 };

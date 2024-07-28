@@ -5,7 +5,7 @@
     <h1 class="alert-message">คุณหยุดหายใจเกิน 25 วินาที !</h1>
     <p class="alert-level">ระดับ เตือน</p>
     <button class="stop-button" @click="navigateToSleeping">กดเพื่อหยุด</button>
-    <button class="test_btn" @click="navigateToSOS">test alert</button>
+    <!-- <button class="test_btn" @click="navigateToSOS">test alert</button> -->
   </div>
 </template>
 
@@ -126,18 +126,19 @@ export default {
   background-color: #000;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   align-self: stretch;
-  margin-top: 78px;
-  font-weight: 700;
-  width: 80%;
-  text-align: center;
-  color: white;
-  font-size: 20px;
-  font-family: "CustomFont", sans-serif;
-  margin: auto;
-  white-space: nowrap;
-  text-align: center;
-  padding: 17px 40px;
-  margin-top: 250px;
-  cursor: pointer;
+    margin-top: 78px;
+    font-weight: 700;
+    margin:auto;
+    width:80%;
+    text-align: center;
+    color:white;
+    font-size: 20px;
+    font-family: "CustomFont", sans-serif;
+    white-space: nowrap;
+    text-align: center;
+    padding: 27px 40px;
+    margin-top: 150px;
+    margin-bottom: -90px;
+    cursor: pointer;
 }
 </style>

@@ -11,17 +11,17 @@
       <section class="sleep-start-section" @click="navigateToSleeping">
         <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/d2d95dc68ad82486c0a84439e3cdfc1d5b8de6bcb3f140154d61f9e3090e3cd8?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="sleep-icon" alt="Sleep icon" />
         <p class="sleep-text">เริ่มนอน</p>
-      </section>
-      <section class="sensor-selector">
-        <p id="connection_type">
-          <input type="radio" id="ble" name="type" value="1" checked>
-          <label id="ble_label" for="ble">Bluetooth</label>
-          <input type="radio" id="usb" name="type" value="0">
-          <label id="usb_label" for="usb">USB</label><br>
-        </p>
-        <button id="select_device" @click="selectDevice">Select a Go Direct Device</button>
-        <div id="error" v-html="error"></div>
-        <pre id="output">{{ output }}</pre>
+      <!-- </section> -->
+      <!-- <section class="sensor-selector"> -->
+        <!-- <p id="connection_type"> -->
+          <!-- <input type="radio" id="ble" name="type" value="1" checked> -->
+          <!-- <label id="ble_label" for="ble">Bluetooth</label> -->
+          <!-- <input type="radio" id="usb" name="type" value="0"> -->
+          <!-- <label id="usb_label" for="usb">USB</label><br> -->
+        <!-- </p> -->
+        <!-- <button id="select_device" @click="selectDevice">Select a Go Direct Device</button> -->
+        <!-- <div id="error" v-html="error"></div> -->
+        <!-- <pre id="output">{{ output }}</pre> -->
       </section>
       <footer class="footer-actions">
         <div class="action-item">
