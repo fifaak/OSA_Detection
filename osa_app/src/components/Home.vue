@@ -67,15 +67,15 @@ export default {
       const timer = setInterval(updateTime, 1000);
       onUnmounted(() => clearInterval(timer));
 
-      try {
-        const gdModule = await import('@vernier/godirect');
-        godirect.value = gdModule.default;
-        console.log("Go Direct library loaded:", godirect.value);
-        initializeDeviceSupport();
-      } catch (err) {
-        console.error("Failed to load Go Direct library:", err);
-        error.value = "Failed to load Go Direct library";
-      }
+      // try {
+      //   const gdModule = await import('@vernier/godirect');
+      //   godirect.value = gdModule.default;
+      //   console.log("Go Direct library loaded:", godirect.value);
+      //   initializeDeviceSupport();
+      // } catch (err) {
+      //   console.error("Failed to load Go Direct library:", err);
+      //   error.value = "Failed to load Go Direct library";
+      // }
     });
 
     const formattedTime = computed(() => {

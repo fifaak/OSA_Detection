@@ -9,24 +9,21 @@
     <main>
       <p class="status-message" v-html="formattedElapsedTime"></p>
       <button class="stop-recording-btn" @click="stopTimer">ยืนยันการตื่นนอน</button>
-      <button @click="startSampling" class="start-recording-btn" style="z-index: 1;">เริ่มนอน</button>
       
       <section class="sensor-selector">
         <p id="connection_type">
           <input type="radio" id="ble" name="type" value="1" checked>
-          <!-- <label id="ble_label" for="ble">Bluetooth</label> -->
-          <!-- <input type="radio" id="usb" name="type" value="0"> -->
-          <!-- <label id="usb_label" for="usb">USB</label><br> -->
+          <label id="ble_label" for="ble">Bluetooth</label>
+          <input type="radio" id="usb" name="type" value="0">
+          <label id="usb_label" for="usb">USB</label><br>
         </p>
         <button id="select_device" @click="selectDevice">
           <img src="../assets/search.png" width="100%" alt="">
         </button>
-        <!-- <div id="error" v-html="error"></div> -->
-        <pre id="output">{{ output }}</pre>
-        <!-- <p id="result">{{ result }}</p> -->
       </section>
+      <p class="device-status" :style="{ color: deviceStatusColor }">{{ deviceStatus }}</p>
+      <button @click="startSampling" class="start-recording-btn" style="z-index: 1;">เริ่มนอน</button>
     </main>
-    <!-- <button class="test_btn" @click="navigateToAlert">test alert</button> -->
   </div>
 </template>
 
@@ -46,12 +43,11 @@ export default {
     const output = ref('');
     const result = ref('');
     const godirect = ref(null);
+    const deviceStatus = ref('Not Ready'); // New reactive variable for device status
     let device = null;
     let samplingInterval = null;
     let predictionInterval = null;
     const sensorData = ref([]);
-
-    const startRecordingBtn = ref(null);
 
     const updateTime = () => {
       currentTime.value = new Date();
@@ -71,6 +67,10 @@ export default {
       const minutes = Math.floor((elapsedTime.value % 3600) / 60);
       const seconds = elapsedTime.value % 60;
       return `นอน ${hours} ชม. <br> ${minutes} นาที : ${seconds}วินาที`;
+    });
+
+    const deviceStatusColor = computed(() => {
+      return deviceStatus.value === 'Ready' ? 'green' : 'red';
     });
 
     let timer;
@@ -115,6 +115,10 @@ export default {
       saveToCSV();
       sendSensorData();
       router.push('/Dashboard');
+    };
+
+    const hideIndex = () => {
+      document.getElementsByClassName("start-recording-btn")[0].style.zIndex = -1;
     };
 
     const initializeDeviceSupport = () => {
@@ -177,6 +181,7 @@ export default {
 
         if (device) {
           output.value += `\nConnected to ${device.name}\n`;
+          deviceStatus.value = 'Ready'; // Update device status to Ready
 
           try {
             await device.open();
@@ -190,14 +195,17 @@ export default {
 
           device.on('device-closed', () => {
             output.value += `\nDisconnected from ${device.name}\n`;
+            deviceStatus.value = 'Not Ready'; // Update device status to Not Ready
           });
 
         } else {
           error.value = "No device found";
+          deviceStatus.value = 'Not Ready'; // Update device status to Not Ready
         }
       } catch (err) {
         console.error(err);
         error.value += "\n " + err;
+        deviceStatus.value = 'Not Ready'; // Update device status to Not Ready
         if (err.toString().includes('cross-origin')) {
           error.value += '\n<p><b>Are you running in an embedded iframe? Try running this example in its own window.</b></p>';
         }
@@ -208,10 +216,11 @@ export default {
       console.log("start!!");
       if (!device) {
         error.value = "No device connected. Please select a device first.";
+        deviceStatus.value = 'Not Ready'; // Update device status to Not Ready
         return;
       }
 
-      startRecordingBtn.value.style.zIndex = '-1';
+      hideIndex(); // Set z-index to -1 when the device is connected
 
       startTime.value = new Date();
       sensorData.value = [];
@@ -313,7 +322,9 @@ export default {
       error,
       output,
       result,
-      startRecordingBtn,
+      deviceStatus, // Include deviceStatus in return
+      deviceStatusColor, // Include deviceStatusColor in return
+      hideIndex
     };
   }
 };
@@ -333,5 +344,10 @@ export default {
 #error {
   color: red;
   font-weight: bold;
+}
+.device-status {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: -70px;
 }
 </style>

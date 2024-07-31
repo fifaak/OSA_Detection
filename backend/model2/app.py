@@ -70,7 +70,7 @@ def predict():
     
     new_state = workflow(file_path)
     os.remove(file_path)  # Clean up the uploaded file after processing
-    
+    print(new_state)
     return jsonify({'state': new_state})
 
 if __name__ == '__main__':
