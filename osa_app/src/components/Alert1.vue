@@ -1,17 +1,17 @@
 <template>
-  <div class="breathing-alert">
+  <div class="breathing-alert" @mouseenter="playAudio">
     <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/f8b3c38ac465a7bc7a71441f87d388fb98da3154f1d74ea3f1e940c5c18ceaf1?apiKey=167f8969fc9e4702b2c941ecb34dd7f8&" class="background-image" alt="" />
     <img loading="lazy" src="../assets/Alert.png" class="alert-icon" alt="Alert icon" />
     <h1 class="alert-message">คุณหยุดหายใจเกิน 25 วินาที !</h1>
     <p class="alert-level">ระดับ เตือน</p>
     <button class="stop-button" @click="navigateToSleeping">กดเพื่อหยุด</button>
-    <!-- <button class="test_btn" @click="navigateToSOS">test alert</button> -->
   </div>
 </template>
 
 <script>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import alertSound from '../assets/alertsound.mp3';
 
 export default {
   name: 'Alert1',
@@ -20,19 +20,37 @@ export default {
     const alertTimeout = ref(null);
     const intervalId = ref(null);
     const secondsElapsed = ref(0);
+    const audio = ref(null);
 
     const navigateToSleeping = () => {
       clearTimeout(alertTimeout.value);
       clearInterval(intervalId.value);
+      if (audio.value) {
+        audio.value.pause();
+        audio.value.currentTime = 0;
+      }
       router.push('/sleeping');
     };
 
     const navigateToSOS = () => {
       clearInterval(intervalId.value);
+      if (audio.value) {
+        audio.value.pause();
+        audio.value.currentTime = 0;
+      }
       router.push('/Alert2');
     };
 
+    const playAudio = () => {
+      if (audio.value) {
+        audio.value.play();
+      }
+    };
+
     onMounted(() => {
+      audio.value = new Audio(alertSound);
+      audio.value.loop = true;
+
       alertTimeout.value = setTimeout(() => {
         navigateToSOS();
       }, 25000); // Navigate to Alert2 after 25 seconds
@@ -49,11 +67,16 @@ export default {
     onUnmounted(() => {
       clearTimeout(alertTimeout.value);
       clearInterval(intervalId.value);
+      if (audio.value) {
+        audio.value.pause();
+        audio.value.currentTime = 0;
+      }
     });
 
     return {
       navigateToSleeping,
       navigateToSOS,
+      playAudio,
     };
   },
 };
@@ -126,19 +149,19 @@ export default {
   background-color: #000;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   align-self: stretch;
-    margin-top: 78px;
-    font-weight: 700;
-    margin:auto;
-    width:80%;
-    text-align: center;
-    color:white;
-    font-size: 20px;
-    font-family: "CustomFont", sans-serif;
-    white-space: nowrap;
-    text-align: center;
-    padding: 27px 40px;
-    margin-top: 150px;
-    margin-bottom: -90px;
-    cursor: pointer;
+  margin-top: 78px;
+  font-weight: 700;
+  margin: auto;
+  width: 80%;
+  text-align: center;
+  color: white;
+  font-size: 20px;
+  font-family: "CustomFont", sans-serif;
+  white-space: nowrap;
+  text-align: center;
+  padding: 27px 40px;
+  margin-top: 150px;
+  margin-bottom: -90px;
+  cursor: pointer;
 }
 </style>
